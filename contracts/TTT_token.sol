@@ -2,10 +2,11 @@
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract TTT is ERC20, Ownable {
+import "./ICOToken.sol";
+
+contract TTT is ICOToken, Ownable {
     /*
         Only user fron white list can call transfer before ICO ending
     */
@@ -69,6 +70,7 @@ contract TTT is ERC20, Ownable {
     */
     function buyTokens(address reciever, uint amount)
         external
+        override
         isICO
         ICOInProccessing
     {
