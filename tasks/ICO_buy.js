@@ -1,5 +1,3 @@
-const { task } = require("hardhat/config");
-
 require("dotenv").config();
 
 task("buyToken", "Allows buy token while ICO. You may pass amount of TTT tokens what you want to buy or " + 
@@ -13,7 +11,7 @@ task("buyToken", "Allows buy token while ICO. You may pass amount of TTT tokens 
             throw ("You need to pass only ETH or only TTT amount");
         }
         const ICOFactory = await ethers.getContractFactory("ICO");
-        const ICO = await ICOFactory.attach(process.env.CONTRACT_ADDRESS);
+        const ICO = await ICOFactory.attach(process.env.ICO_CONTRACT_ADDRESS);
 
         if (taskArgs.eth != undefined) {
             const lastBlockTImestamp = (await ethers.provider.getBlock("latest")).timestamp;

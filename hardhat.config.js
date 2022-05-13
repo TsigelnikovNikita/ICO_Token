@@ -4,6 +4,7 @@ require('solidity-coverage');
 require("dotenv").config();
 
 require('./tasks/ICO_buy');
+require('./tasks/Token_balanceOf');
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
