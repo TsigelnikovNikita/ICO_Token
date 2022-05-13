@@ -216,4 +216,35 @@ describe("Token testing", function () {
             expect(await token.balanceOf(owner.address)).to.be.eq(0);
         });
     });
+
+    describe("Token.mint and Token.burn testing", function() {
+        let value
+
+        beforeEach(async function() {
+            value = ethers.utils.parseEther(testUtils.getRandomEthers(1, 10)).mul(42);
+        });
+
+        it("Token.mint and Token.burn should throw an exception if was called by not owner", async function () {
+            await expect(token.connect(investor).mint(investor.address, value))
+                .to.be.rejectedWith(Error)
+                .then((error) => {
+                    expect(error.message).to.be.contain("Ownable: caller is not the owner");
+                });
+
+            await expect(token.connect(investor).burn(investor.address, value))
+                .to.be.rejectedWith(Error)
+                .then((error) => {
+                    expect(error.message).to.be.contain("Ownable: caller is not the owner");
+                });
+        });
+
+        it("Token.mint and Token.burn should work correctly", async function () {
+            await token.mint(owner.address, value);
+            expect(await token.balanceOf(owner.address)).to.be.eq(value);
+
+            await token.burn(owner.address, value);
+            expect(await token.balanceOf(owner.address)).to.be.eq(0);
+        });
+
+    })
 });

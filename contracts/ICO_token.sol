@@ -178,7 +178,6 @@ contract ICO_Token is ERC20, Ownable {
     */
     function mint(address account, uint256 amount)
         external
-        payable
         onlyOwner
     {
         _mint(account, amount);
