@@ -8,10 +8,10 @@ import "./ICO_token.sol";
 
 contract ICO is Ownable {
     /*
-        ICO has three periods.
-        In the first period user can buy 42 TTT token for 1 ETH.
-        In the second one - 21 TTT token for 1 ETH.
-        And the last one -  8 TTT token for 1 ETH.
+        ICO has three periods:
+            In the first one user can buy 42 TTT token for 1 ETH.
+            In the second one - 21 TTT token for 1 ETH.
+            And the last one -  8 TTT token for 1 ETH.
     */
     uint32 public constant FIRST_PERIOD = 3 days;
     uint32 public constant SECOND_PERIOD = FIRST_PERIOD + 30 days;

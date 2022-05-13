@@ -7,19 +7,21 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 /*
     Smart contract based on ERC20. Additionally this smart contract provides
-    functionnality for ICO. You need to pass end time of your ICO and ICO address
+    functionality for ICO. You need to pass end time of your ICO and ICO address
     in the constructor.
 
     Also you may create smart contract directly in the ICO smart contract and
-    just send your address as owner and ICO address as ICO_address.
+    just send your address as an owner and ICO address as ICO_address.
 
-    Smart contrcat also provides "what list psrticipants" logic. An owner can add
-    to/remove from this list. Participant from whiteList can have additional
-    privileges (for example trasfer tokents before ICO ending).
+    Smart contrcat also provides "white list" logic. An owner can add
+    to/remove from this list. Participant from whiteList may have additional
+    privileges (for example transfer tokens before ICO ending).
+
+    Repo of this project: https://github.com/TsigelnikovNikita/ICO_Token
 */
 contract ICO_Token is ERC20, Ownable {
     /*
-        Only users fron white list can call transfer before ICO ending
+        Only users fron white list can call transfer before ICO ending.
     */
     mapping (address => bool) public whiteList;
     address public immutable ICO_ADDRESS;
@@ -43,14 +45,12 @@ contract ICO_Token is ERC20, Ownable {
         modofiers
     */
     modifier isICO() {
-        require(msg.sender == ICO_ADDRESS,
-            "Token: caller is not ICO");
+        require(msg.sender == ICO_ADDRESS, "Token: caller is not ICO");
         _;
     }
 
     modifier ICOIsActive() {
-        require(block.timestamp < ICO_END_TIME,
-            "Token: ICO is done");
+        require(block.timestamp < ICO_END_TIME, "Token: ICO is done");
         _;
     }
 
@@ -96,6 +96,9 @@ contract ICO_Token is ERC20, Ownable {
         payable(msg.sender).transfer(amount);
     }
 
+    /*
+        If somebody just want to send money to us:)
+    */
     receive() external payable {}
 
     /*
@@ -175,7 +178,7 @@ contract ICO_Token is ERC20, Ownable {
 
 
     /*
-        Only owner can add or remove tokens
+        Only owner can add and remove tokens
     */
     function mint(address account, uint256 amount)
         external
