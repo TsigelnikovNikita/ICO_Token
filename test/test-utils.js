@@ -5,5 +5,10 @@ const THIRD_PERIOD = SECOND_PERIOD + 14 * 24 * 60 * 60; // + 2 weeks
 module.exports = {
     FIRST_PERIOD,
     SECOND_PERIOD,
-    THIRD_PERIOD
+    THIRD_PERIOD,
+    getRandomEthers
 };
+
+function getRandomEthers(min, max) {
+    return (Math.random() * (max - min) + min).toFixed(10);
+}

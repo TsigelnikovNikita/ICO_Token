@@ -46,7 +46,7 @@ contract ICO is Ownable {
         modifiers
     */
     modifier ICOisActive() {
-        require(block.timestamp > ICO_END_TIME,
+        require(block.timestamp < ICO_END_TIME,
             "ICO is done");
         _;
     }

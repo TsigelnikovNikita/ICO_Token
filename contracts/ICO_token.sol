@@ -49,7 +49,7 @@ contract ICO_Token is ERC20, Ownable {
     }
 
     modifier ICOIsActive() {
-        require(block.timestamp > ICO_END_TIME,
+        require(block.timestamp < ICO_END_TIME,
             "ICO is done");
         _;
     }

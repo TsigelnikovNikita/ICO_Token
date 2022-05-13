@@ -23,7 +23,6 @@ module.exports = {
     paths: [
       "@openzeppelin/contracts/token/ERC20/ERC20.sol",
       "@openzeppelin/contracts/access/Ownable.sol",
-      "@openzeppelin/contracts/token/ERC20/IERC20.sol"
     ],
   },
 };
