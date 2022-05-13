@@ -31,3 +31,11 @@ module.exports = {
     ],
   },
 };
+
+if (process.env.SIGNER_PRIVATE_KEY == undefined ||
+    process.env.RINKEBY_NETWORK_URI == undefined) {
+  delete module.exports.networks.rinkeby
+}
+if (process.env.ETHERSCAN_API_KEY == undefined) {
+  delete module.exports.etherscan
+}
