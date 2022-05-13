@@ -99,7 +99,7 @@ contract ICO_Token is ERC20, Ownable {
 
     /*
         Addresses from white list have additional privilegies.
-        (For example call trasnfer before the ICO end)
+        (For example call transfer before the ICO end)
     */
     function addToWhiteList(address participant)
         external

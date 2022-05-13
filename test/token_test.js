@@ -108,11 +108,15 @@ describe("Token testing", function () {
     });
 
     describe("Token.ERC20 functions testing", function() {
-        it("Token.transfer should work only after end of ICO or if investor is in the whiteList", async function() {
-            const value = ethers.utils.parseEther(testUtils.getRandomEthers(1, 10)).mul(42);
+        let value
+
+        beforeEach(async function() {
+            value = ethers.utils.parseEther(testUtils.getRandomEthers(1, 10)).mul(42);
 
             await token.connect(ICO).buyTokens(investor.address, value);
+        });
 
+        it("Token.transfer should work only after end of ICO or if investor is in the whiteList", async function() {
             await expect(token.connect(investor).transfer(owner.address, value))
                 .to.be.rejectedWith(Error)
                 .then((error) => {
@@ -137,10 +141,6 @@ describe("Token testing", function () {
         });
 
         it("Token.approve should work only after end of ICO or if investor is in the whiteList", async function() {
-            const value = ethers.utils.parseEther(testUtils.getRandomEthers(1, 10)).mul(42);
-
-            await token.connect(ICO).buyTokens(investor.address, value);
-
             await expect(token.connect(investor).approve(owner.address, value))
                 .to.be.rejectedWith(Error)
                 .then((error) => {
@@ -162,5 +162,33 @@ describe("Token testing", function () {
             expect(await token.allowance(investor.address, owner.address)).to.be.eq(value);
         });
 
+        it("Token.transferFrom should work only after end of ICO or if investor is in the whiteList", async function() {
+            await expect(token.transferFrom(investor.address, owner.address, value))
+                .to.be.rejectedWith(Error)
+                .then((error) => {
+                    expect(error.message).to.be.contain("Token: ICO in processing");
+                });
+
+            await token.addToWhiteList(owner.address);
+            await token.addToWhiteList(investor.address);
+            await token.connect(investor).approve(owner.address, value);
+
+            await token.transferFrom(investor.address, owner.address, value);
+
+            expect(await token.balanceOf(investor.address)).to.be.eq(0);
+            expect(await token.balanceOf(owner.address)).to.be.eq(value);
+            
+            await token.removeFromWhiteList(owner.address);
+            await token.removeFromWhiteList(investor.address);
+
+            const lastBlockTimestamp = (await ethers.provider.getBlock("latest")).timestamp;
+            await network.provider.send("evm_setNextBlockTimestamp", [lastBlockTimestamp + testUtils.THIRD_PERIOD]);
+
+            await token.approve(investor.address, value);
+            await token.connect(investor).transferFrom(owner.address, investor.address, value);
+
+            expect(await token.balanceOf(investor.address)).to.be.eq(value);
+            expect(await token.balanceOf(owner.address)).to.be.eq(0);
+        });
     });
 });
