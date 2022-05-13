@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./ICO_token.sol";
@@ -14,13 +13,13 @@ contract ICO is Ownable {
         In the second one - 21 TTT token for 1 ETH.
         And the last one -  8 TTT token for 1 ETH.
     */
-    uint public constant FIRST_PERIOD = 3 days;
-    uint public constant SECOND_PERIOD = FIRST_PERIOD + 30 days;
-    uint public constant THIRD_PERIOD = SECOND_PERIOD + 2 weeks;
+    uint32 public constant FIRST_PERIOD = 3 days;
+    uint32 public constant SECOND_PERIOD = FIRST_PERIOD + 30 days;
+    uint32 public constant THIRD_PERIOD = SECOND_PERIOD + 2 weeks;
 
-    uint public constant TOKENS_PER_ONE_ETH_FIRST_PERIOD = 42;
-    uint public constant TOKENS_PER_ONE_ETH_SECOND_PERIOD = 21;
-    uint public constant TOKENS_PER_ONE_ETH_THIRD_PERIOD = 8;
+    uint8 public constant TOKENS_PER_ONE_ETH_FIRST_PERIOD = 42;
+    uint8 public constant TOKENS_PER_ONE_ETH_SECOND_PERIOD = 21;
+    uint8 public constant TOKENS_PER_ONE_ETH_THIRD_PERIOD = 8;
 
     uint public immutable ICO_START_TIME;
     uint public immutable ICO_END_TIME;
@@ -90,6 +89,10 @@ contract ICO is Ownable {
         buy();
     }
 
+    /*
+        You can pass amount as zero if you want to withdraw all available ethers,
+        or to pass concrete value. 
+    */
     function withdraw(uint amount)
         external
         onlyOwner

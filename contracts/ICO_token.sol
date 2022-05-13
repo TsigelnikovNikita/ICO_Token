@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
@@ -86,7 +85,8 @@ contract ICO_Token is ERC20, Ownable {
     }
 
     /*
-        Pass zero as amount if you want to withdraw all available ethers.
+        You can pass amount as zero if you want to withdraw all available ethers,
+        or to pass concrete value. 
     */
     function withdraw(uint amount)
         external
