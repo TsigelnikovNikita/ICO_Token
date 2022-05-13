@@ -111,7 +111,7 @@ contract ICO_Token is ERC20, Ownable {
         external
         onlyOwner
     {
-        require(participant != address(0), "Participant address is zero");
+        require(participant != address(0), "Token: Participant address is the zero address");
         whiteList[participant] = true;
         emit addedToWhiteList(participant);
     }
@@ -120,7 +120,7 @@ contract ICO_Token is ERC20, Ownable {
         external
         onlyOwner
     {
-        require(participant != address(0), "Participant address is zero");
+        require(participant != address(0), "Token: Participant address is the zero address");
         whiteList[participant] = false;
         emit removedFromWhiteList(participant);
     }

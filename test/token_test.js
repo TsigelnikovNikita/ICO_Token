@@ -63,19 +63,33 @@ describe("Token testing", function () {
             await token.removeFromWhiteList(investor.address);
             expect(await token.whiteList(investor.address)).to.be.eq(false);
         
-        })
+        });
 
         it("Token.removeFromWhiteList/Token.addToWhiteList should throw an exception when not owner called", async function() {
             await expect(token.connect(investor).addToWhiteList(investor.address))
                 .to.be.rejectedWith(Error)
                 .then((error) => {
-                    expect(error.message).to.be.contain("Ownable: caller is not the owner'");
+                    expect(error.message).to.be.contain("Ownable: caller is not the owner");
                 });
         
             await expect(token.connect(investor).removeFromWhiteList(investor.address))
                 .to.be.rejectedWith(Error)
                 .then((error) => {
-                    expect(error.message).to.be.contain("Ownable: caller is not the owner'");
+                    expect(error.message).to.be.contain("Ownable: caller is not the owner");
+                });
+        });
+
+        it("Token.removeFromWhiteList/Token.addToWhiteList should throw an exception if participant address is zero", async function() {
+            await expect(token.addToWhiteList(ethers.constants.AddressZero))
+                .to.be.rejectedWith(Error)
+                .then((error) => {
+                    expect(error.message).to.be.contain("Token: Participant address is the zero address");
+                });
+
+            await expect(token.removeFromWhiteList(ethers.constants.AddressZero))
+                .to.be.rejectedWith(Error)
+                .then((error) => {
+                    expect(error.message).to.be.contain("Token: Participant address is the zero address");
                 });
         });
 
