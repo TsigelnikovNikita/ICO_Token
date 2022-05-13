@@ -34,6 +34,11 @@ contract TTT is ERC20, Ownable {
         _;
     }
 
+    modifier allowTransfer() {
+        require(ICOisEnd() || whiteList[msg.sender] == true, "ICO in processing");
+        _;
+    }
+
     /*
         events
     */
@@ -42,6 +47,10 @@ contract TTT is ERC20, Ownable {
  
     constructor(uint ICO_endTIme) ERC20("TTT", "TTT") {
         ICO_END_TIME = ICO_endTIme;
+    }
+
+    function ICOisEnd() private view returns(bool) {
+        return block.timestamp > ICO_END_TIME;
     }
 
     /*
@@ -75,5 +84,56 @@ contract TTT is ERC20, Ownable {
         require(participant != address(0), "Participant address is zero");
         whiteList[participant] = false;
         emit removedFromWhiteList(participant);
+    }
+
+    /*
+        Overriding ERC20 functions. We can call their only if:
+            1. ICO is end;
+            2. msg.sender is participant of white list;
+    */
+    function transfer(address to, uint256 amount)
+        public
+        override
+        allowTransfer
+        returns(bool)
+    {
+        return super.transfer(to, amount);
+    }
+
+    function approve(address spender, uint256 amount)
+        public
+        virtual
+        override
+        returns (bool)
+    {
+        return super.approve(spender, amount);
+    }
+
+    function transferFrom(address from, address to, uint256 amount)
+        public
+        virtual
+        override
+        allowTransfer
+        returns (bool)
+    {
+        return super.transferFrom(from, to, amount);
+    }
+
+    function increaseAllowance(address spender, uint256 addedValue)
+        public
+        override
+        allowTransfer
+        returns (bool)
+    {
+        return super.increaseAllowance(spender, addedValue);
+    }
+
+    function decreaseAllowance(address spender, uint256 subtractedValue)
+        public
+        override
+        allowTransfer
+        returns (bool)
+    {
+        return super.decreaseAllowance(spender, subtractedValue);
     }
 }
