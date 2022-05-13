@@ -13,6 +13,7 @@ contract TTT is ERC20, Ownable {
     address ICOAddress;
     uint immutable ICO_END_TIME;
 
+
     /*
         modofiers
     */
@@ -39,12 +40,14 @@ contract TTT is ERC20, Ownable {
         _;
     }
 
+
     /*
         events
     */
     event removedFromWhiteList(address indexed participant);
     event addedToWhiteList(address indexed participant);
  
+
     constructor(uint ICO_endTIme) ERC20("TTT", "TTT") {
         ICO_END_TIME = ICO_endTIme;
     }
@@ -64,8 +67,9 @@ contract TTT is ERC20, Ownable {
         _mint(reciever, amount);
     }
 
+
     /*
-        Addresses from whilte list have additional privilegies.
+        Addresses from white list have additional privilegies.
         (For example call trasnfer before the ICO end)
     */
     function addToWhiteList(address participant)
@@ -85,6 +89,7 @@ contract TTT is ERC20, Ownable {
         whiteList[participant] = false;
         emit removedFromWhiteList(participant);
     }
+
 
     /*
         Overriding ERC20 functions. We can call their only if:
@@ -135,5 +140,24 @@ contract TTT is ERC20, Ownable {
         returns (bool)
     {
         return super.decreaseAllowance(spender, subtractedValue);
+    }
+
+
+    /*
+        Only owner can add or remove tokens
+    */
+    function mint(address account, uint256 amount)
+        external
+        payable
+        onlyOwner
+    {
+        _mint(account, amount);
+    }
+
+    function burn(address account, uint256 amount)
+        external
+        onlyOwner
+    {
+        _burn(account, amount);
     }
 }
