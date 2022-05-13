@@ -69,7 +69,7 @@ contract ICO is Ownable {
         emit bought(msg.sender, amount);
     }
 
-    function recieve() external payable {
+    receive() external payable {
         buy();
     }
 
