@@ -9,9 +9,13 @@ contract TTT is ERC20, Ownable {
     /*
         Only user fron white list can call transfer before ICO ending
     */
-    mapping (address => bool) whiteList;
-    address ICOAddress;
+    mapping (address => bool) private whiteList;
+    address private ICOAddress;
     uint immutable ICO_END_TIME;
+
+    constructor(uint ICO_endTIme) ERC20("TTT", "TTT") {
+        ICO_END_TIME = ICO_endTIme;
+    }
 
 
     /*
@@ -48,12 +52,16 @@ contract TTT is ERC20, Ownable {
     event addedToWhiteList(address indexed participant);
  
 
-    constructor(uint ICO_endTIme) ERC20("TTT", "TTT") {
-        ICO_END_TIME = ICO_endTIme;
-    }
-
     function ICOisEnd() private view returns(bool) {
         return block.timestamp > ICO_END_TIME;
+    }
+
+    function setICOAdderss(address _ICOAddress)
+        external
+        onlyOwner
+    {
+        require(_ICOAddress != address(0), "ICO address is zero address");
+        ICOAddress = _ICOAddress;
     }
 
     /*
@@ -65,6 +73,17 @@ contract TTT is ERC20, Ownable {
         ICOInProccessing
     {
         _mint(reciever, amount);
+    }
+
+    /*
+        Pass zero as amount if you want to withdraw all available ethers.
+    */
+    function withdraw(uint amount)
+        external
+        onlyOwner
+    {
+        amount = amount == 0 ? address(this).balance : amount;
+        payable(msg.sender).transfer(amount);
     }
 
 
@@ -88,6 +107,14 @@ contract TTT is ERC20, Ownable {
         require(participant != address(0), "Participant address is zero");
         whiteList[participant] = false;
         emit removedFromWhiteList(participant);
+    }
+
+    function isInWhiteList(address participant)
+        external
+        view
+        returns(bool)
+    {
+        return whiteList[participant];
     }
 
 
