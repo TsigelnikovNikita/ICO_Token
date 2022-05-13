@@ -7,21 +7,22 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 
 /*
-    Smart contract based on ERC20. Additionnaly this smart contract provides
-    functionnality for ICO. You need to pass end time of your ICO and ICO address in the constructor.
+    Smart contract based on ERC20. Additionally this smart contract provides
+    functionnality for ICO. You need to pass end time of your ICO and ICO address
+    in the constructor.
 
     Also you may create smart contract directly in the ICO smart contract and
     just send your address as owner and ICO address as ICO_address.
 
-    Smart contrcat also provides "what list psrticipants" logic. An owner can add to/remove
-    from this list. Participant from whiteList can have additional privileges (for example
-    trasfer tokents before ICO ending).
+    Smart contrcat also provides "what list psrticipants" logic. An owner can add
+    to/remove from this list. Participant from whiteList can have additional
+    privileges (for example trasfer tokents before ICO ending).
 */
 contract ICO_Token is ERC20, Ownable {
     /*
         Only users fron white list can call transfer before ICO ending
     */
-    mapping (address => bool) private whiteList;
+    mapping (address => bool) public whiteList;
     address public immutable ICO_ADDRESS;
     uint immutable ICO_END_TIME;
 
@@ -122,14 +123,6 @@ contract ICO_Token is ERC20, Ownable {
         require(participant != address(0), "Participant address is zero");
         whiteList[participant] = false;
         emit removedFromWhiteList(participant);
-    }
-
-    function isInWhiteList(address participant)
-        external
-        view
-        returns(bool)
-    {
-        return whiteList[participant];
     }
 
 
