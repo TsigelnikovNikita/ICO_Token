@@ -89,11 +89,40 @@ describe("ICO testing", function () {
                 });
         });
 
-        it("just call a contract should caa buy function as well", async function () {
+        it("sendTranscation to the contract should call buy function", async function () {
             const value = ethers.utils.parseEther(testUtils.getRandomEthers(1, 10));
             await investor.sendTransaction({value: value, to: ICO.address});
 
             expect(await token.balanceOf(investor.address)).to.be.eq(value.mul(42));
+        });
+    });
+
+    describe("ICO.withdraw function testing", function() {
+        it("withdraw function should throw an exception if not owner called", async function () {
+            await expect(ICO.connect(investor).withdraw(0))
+                .to.be.rejectedWith(Error)
+                .then((error) => {
+                    expect(error.message).to.be.contain("Ownable: caller is not the owner'");
+                });
+        });
+
+        it("withdraw function should transfer all available ethers if 0 was passed", async function () {            
+            const value = ethers.utils.parseEther(testUtils.getRandomEthers(1, 10));
+            await ICO.connect(investor).buy({value: value});
+
+            const withdrawTx = await ICO.withdraw(0);
+            await expect(() => withdrawTx)
+                .to.changeEtherBalances([ICO, owner], [BigNumber.from(0).sub(value), value]);
+        });
+
+        it("withdraw function should transfer passing ether amount", async function () {            
+            const value = ethers.utils.parseEther(testUtils.getRandomEthers(1, 10));
+            await ICO.connect(investor).buy({value: value});
+
+            const withdrawAmount = value.div(2);
+            const withdrawTx = await ICO.withdraw(withdrawAmount);
+            await expect(() => withdrawTx)
+                .to.changeEtherBalances([ICO, owner], [BigNumber.from(0).sub(withdrawAmount), withdrawAmount]);
         });
     });
 });
