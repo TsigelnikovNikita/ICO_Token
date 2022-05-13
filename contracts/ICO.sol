@@ -4,7 +4,8 @@ pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "./ICOToken.sol";
+import "./ICO_token.sol";
+
 
 contract ICO is Ownable {
     /*
@@ -23,13 +24,15 @@ contract ICO is Ownable {
 
     uint public immutable ICO_START_TIME;
     uint public immutable ICO_END_TIME;
-    ICOToken public immutable TOKEN;
+    ICO_Token public immutable TOKEN;
 
 
-    constructor(address _tokenAddress, uint ICO_EndTIme) {
+    constructor() {
         ICO_START_TIME = block.timestamp;
-        ICO_END_TIME = ICO_EndTIme;
-        TOKEN = ICOToken(_tokenAddress);
+        ICO_END_TIME = block.timestamp + THIRD_PERIOD;
+        TOKEN = new ICO_Token("TTT_Token", "TTT",
+                                msg.sender, address(this),
+                                block.timestamp + THIRD_PERIOD);
     }
 
 

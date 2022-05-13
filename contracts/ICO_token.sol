@@ -3,19 +3,39 @@ pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-import "./ICOToken.sol";
 
-contract TTT is ICOToken, Ownable {
+/*
+    Smart contract based on ERC20. Additionnaly this smart contract provides
+    functionnality for ICO. You need to pass end time of your ICO and ICO address in the constructor.
+
+    Also you may create smart contract directly in the ICO smart contract and
+    just send your address as owner and ICO address as ICO_address.
+
+    Smart contrcat also provides "what list psrticipants" logic. An owner can add to/remove
+    from this list. Participant from whiteList can have additional privileges (for example
+    trasfer tokents before ICO ending).
+*/
+contract ICO_Token is ERC20, Ownable {
     /*
-        Only user fron white list can call transfer before ICO ending
+        Only users fron white list can call transfer before ICO ending
     */
     mapping (address => bool) private whiteList;
-    address private ICOAddress;
+    address public immutable ICO_ADDRESS;
     uint immutable ICO_END_TIME;
 
-    constructor(uint ICO_endTIme) ERC20("TTT", "TTT") {
-        ICO_END_TIME = ICO_endTIme;
+
+    constructor(string memory name,
+                string memory symbol,
+                address realOwner,
+                address ICO_address,
+                uint ICO_endTime
+                ) ERC20(name, symbol)
+    {
+        ICO_END_TIME = ICO_endTime;
+        ICO_ADDRESS = ICO_address;
+        transferOwnership(realOwner);
     }
 
 
@@ -23,7 +43,7 @@ contract TTT is ICOToken, Ownable {
         modofiers
     */
     modifier isICO() {
-        require(msg.sender == ICOAddress,
+        require(msg.sender == ICO_ADDRESS,
             "This method can call only ICO contract");
         _;
     }
@@ -57,20 +77,13 @@ contract TTT is ICOToken, Ownable {
         return block.timestamp > ICO_END_TIME;
     }
 
-    function setICOAdderss(address _ICOAddress)
-        external
-        onlyOwner
-    {
-        require(_ICOAddress != address(0), "ICO address is zero address");
-        ICOAddress = _ICOAddress;
-    }
-
     /*
-        Use this function ONLY while ICO.  
+        Use this function ONLY while ICO.
+        You can override this for your implementation.  
     */
     function buyTokens(address reciever, uint amount)
         external
-        override
+        virtual
         isICO
         ICOIsActive
     {
