@@ -96,6 +96,7 @@ contract ICO_Token is ERC20, Ownable {
         payable(msg.sender).transfer(amount);
     }
 
+    receive() external payable {}
 
     /*
         Addresses from white list have additional privilegies.

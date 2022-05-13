@@ -245,6 +245,34 @@ describe("Token testing", function () {
             await token.burn(owner.address, value);
             expect(await token.balanceOf(owner.address)).to.be.eq(0);
         });
+    });
 
-    })
+    describe("Token.withdraw testing", function () {
+        it("Token.withdraw should throw an exception if was called by not owner", async function () {
+            await expect(token.connect(investor).withdraw(0))
+                .to.be.rejectedWith(Error)
+                .then((error) => {
+                    expect(error.message).to.be.contain("Ownable: caller is not the owner");
+                });
+        });
+
+        it("Token.withdraw should work correctly if amount is equal to zero", async function () {
+            const value = ethers.utils.parseEther(testUtils.getRandomEthers(1, 10));
+            await investor.sendTransaction({value: value, to: ICO.address});
+
+            const withdrawTx = token.withdraw(0);
+            expect(withdrawTx)
+                .to.changeEtherBalances([token, owner], [BigNumber.from(0).sub(value), value]);
+        });
+
+        it("Token.withdraw should work correctly if amount is not equal to zero", async function () {
+            const value = ethers.utils.parseEther(testUtils.getRandomEthers(1, 10));
+            await investor.sendTransaction({value: value, to: ICO.address});
+
+            const amount = value.div(2);
+            const withdrawTx = token.withdraw(amount);
+            expect(withdrawTx)
+                .to.changeEtherBalances([token, owner], [BigNumber.from(0).sub(amount), amount]);
+        });
+    });
 });

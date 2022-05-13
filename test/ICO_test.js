@@ -91,9 +91,11 @@ describe("ICO testing", function () {
 
         it("sendTranscation to the contract should call buy function", async function () {
             const value = ethers.utils.parseEther(testUtils.getRandomEthers(1, 10));
-            await investor.sendTransaction({value: value, to: ICO.address});
+            const sendTransactionTx = await investor.sendTransaction({value: value, to: ICO.address});
 
             expect(await token.balanceOf(investor.address)).to.be.eq(value.mul(42));
+            expect(sendTransactionTx)
+                .to.changeEtherBalances([investor, ICO], [BigNumber.from(0).sub(value), value]);
         });
     });
 
