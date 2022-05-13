@@ -36,11 +36,11 @@ describe("ICO testing", function () {
         expect(await token.symbol()).to.be.eq("TTT");
     });
 
-    describe("ICO.buy function testing", function () {
-        it("buy method should correctly transfer value from investor to " +
+    describe("ICO.buy() function testing", function () {
+        it("buy() method should correctly transfer value from investor to " +
             "the contract and emit an event", async function () {
             const value = ethers.utils.parseEther(testUtils.getRandomEthers(1, 10));
-            const buyTx = await ICO.connect(investor).buy({value: value});
+            const buyTx = await ICO.connect(investor)['buy()']({value: value});
 
             await expect(() => buyTx)
                 .to.changeEtherBalances([ICO, investor], [value, BigNumber.from(0).sub(value)]);
@@ -49,40 +49,40 @@ describe("ICO testing", function () {
                 .withArgs(investor.address, value.mul(42));
         });
 
-        it("buy method should transfer correct TTT token amount in the first period", async function () {
+        it("buy() method should transfer correct TTT token amount in the first period", async function () {
             const value = ethers.utils.parseEther(testUtils.getRandomEthers(1, 10));
-            await ICO.connect(investor).buy({value: value});
+            await ICO.connect(investor)['buy()']({value: value});
 
             expect(await token.balanceOf(investor.address)).to.be.eq(value.mul(42));
         });
 
-        it("buy method should transfer correct TTT token amount in the second period", async function () {
+        it("buy() method should transfer correct TTT token amount in the second period", async function () {
             const lastBlockTimestamp = (await ethers.provider.getBlock("latest")).timestamp;
             await network.provider.send("evm_setNextBlockTimestamp", [lastBlockTimestamp + testUtils.FIRST_PERIOD]);
 
             const value = ethers.utils.parseEther(testUtils.getRandomEthers(1, 10));
-            await ICO.connect(investor).buy({value: value});
+            await ICO.connect(investor)['buy()']({value: value});
 
             expect(await token.balanceOf(investor.address)).to.be.eq(value.mul(21));
 
         });
 
-        it("buy method should transfer correct TTT token amount in the third period", async function () {
+        it("buy() method should transfer correct TTT token amount in the third period", async function () {
             const lastBlockTimestamp = (await ethers.provider.getBlock("latest")).timestamp;
             await network.provider.send("evm_setNextBlockTimestamp", [lastBlockTimestamp + testUtils.SECOND_PERIOD]);
 
             const value = ethers.utils.parseEther(testUtils.getRandomEthers(1, 10));
-            await ICO.connect(investor).buy({value: value});
+            await ICO.connect(investor)['buy()']({value: value});
 
             expect(await token.balanceOf(investor.address)).to.be.eq(value.mul(8));
         });
 
-        it("buy method should throw an exception after end of ICO", async function () {
+        it("buy() method should throw an exception after end of ICO", async function () {
             const lastBlockTimestamp = (await ethers.provider.getBlock("latest")).timestamp;
             await network.provider.send("evm_setNextBlockTimestamp", [lastBlockTimestamp + testUtils.THIRD_PERIOD]);
 
             const value = ethers.utils.parseEther(testUtils.getRandomEthers(1, 10));
-            await expect(ICO.connect(investor).buy({value: value}))
+            await expect(ICO.connect(investor)['buy()']({value: value}))
                 .to.be.rejectedWith(Error)
                 .then((error) => {
                     expect(error.message).to.be.contain("ICO is done");
@@ -110,7 +110,7 @@ describe("ICO testing", function () {
 
         it("withdraw function should transfer all available ethers if 0 was passed", async function () {            
             const value = ethers.utils.parseEther(testUtils.getRandomEthers(1, 10));
-            await ICO.connect(investor).buy({value: value});
+            await ICO.connect(investor)['buy()']({value: value});
 
             const withdrawTx = await ICO.withdraw(0);
             await expect(() => withdrawTx)
@@ -119,7 +119,7 @@ describe("ICO testing", function () {
 
         it("withdraw function should transfer passing ether amount", async function () {            
             const value = ethers.utils.parseEther(testUtils.getRandomEthers(1, 10));
-            await ICO.connect(investor).buy({value: value});
+            await ICO.connect(investor)['buy()']({value: value});
 
             const withdrawAmount = value.div(2);
             const withdrawTx = await ICO.withdraw(withdrawAmount);

@@ -51,19 +51,36 @@ contract ICO is Ownable {
         _;
     }
 
+    function getCurrentExchangeRate() public view returns(uint) {
+        if (block.timestamp < ICO_START_TIME + FIRST_PERIOD) {
+            return TOKENS_PER_ONE_ETH_FIRST_PERIOD;
+        } else if (block.timestamp < ICO_START_TIME + SECOND_PERIOD) {
+            return TOKENS_PER_ONE_ETH_SECOND_PERIOD;
+        } else {
+            return TOKENS_PER_ONE_ETH_THIRD_PERIOD;
+        }
+    }
 
     function buy()
         public
         payable
         ICOisActive
     {
-        uint256 amount;
-        if (block.timestamp < ICO_START_TIME + FIRST_PERIOD) {
-            amount = msg.value * TOKENS_PER_ONE_ETH_FIRST_PERIOD;
-        } else if (block.timestamp < ICO_START_TIME + SECOND_PERIOD) {
-            amount = msg.value * TOKENS_PER_ONE_ETH_SECOND_PERIOD;
-        } else {
-            amount = msg.value * TOKENS_PER_ONE_ETH_THIRD_PERIOD;
+        uint256 amount = msg.value * getCurrentExchangeRate();
+        buy(amount);
+    }
+
+    function buy(uint amount)
+        public
+        payable
+        ICOisActive
+    {
+        uint currentExchangeRate = getCurrentExchangeRate();
+
+        require(amount <= msg.value * currentExchangeRate);
+        if (amount < msg.value * currentExchangeRate) {
+            uint payback = (msg.value * currentExchangeRate - amount) / currentExchangeRate;
+            payable(msg.sender).transfer(payback);
         }
         TOKEN.buyTokens(msg.sender, amount);
         emit bought(msg.sender, amount);
