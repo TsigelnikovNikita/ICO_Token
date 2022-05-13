@@ -117,6 +117,9 @@ describe("Token testing", function () {
         });
 
         it("Token.transfer should work only after end of ICO or if investor is in the whiteList", async function() {
+            /*
+                We cannot call transfer before end of ICO and if we aren't in the whiteList
+            */
             await expect(token.connect(investor).transfer(owner.address, value))
                 .to.be.rejectedWith(Error)
                 .then((error) => {
@@ -125,6 +128,9 @@ describe("Token testing", function () {
 
             await token.addToWhiteList(investor.address);
 
+            /*
+                We can call transfer before end of ICO if we are in the whiteList
+            */
             await token.connect(investor).transfer(owner.address, value.div(2));
             expect(await token.balanceOf(investor.address)).to.be.eq(value.div(2));
             expect(await token.balanceOf(owner.address)).to.be.eq(value.div(2));
@@ -134,6 +140,9 @@ describe("Token testing", function () {
             const lastBlockTimestamp = (await ethers.provider.getBlock("latest")).timestamp;
             await network.provider.send("evm_setNextBlockTimestamp", [lastBlockTimestamp + testUtils.THIRD_PERIOD]);
 
+            /*
+                We can call transfer after end of ICO even if we aren't in the whiteList
+            */
             await token.connect(investor).transfer(owner.address, value.div(2));
             expect(await token.balanceOf(investor.address)).to.be.eq(0);
             expect(await token.balanceOf(owner.address)).to.be.eq(value);
@@ -141,6 +150,9 @@ describe("Token testing", function () {
         });
 
         it("Token.approve should work only after end of ICO or if investor is in the whiteList", async function() {
+            /*
+                We cannot call approve before end of ICO and if we aren't in the whiteList
+            */
             await expect(token.connect(investor).approve(owner.address, value))
                 .to.be.rejectedWith(Error)
                 .then((error) => {
@@ -148,8 +160,10 @@ describe("Token testing", function () {
                 });
 
             await token.addToWhiteList(investor.address);
+            /*
+                We can call approve before end of ICO if we are in the whiteList
+            */
             await token.connect(investor).approve(owner.address, value);
-
             expect(await token.allowance(investor.address, owner.address)).to.be.eq(value);
 
             await token.connect(investor).decreaseAllowance(owner.address, value);
@@ -157,12 +171,18 @@ describe("Token testing", function () {
 
             const lastBlockTimestamp = (await ethers.provider.getBlock("latest")).timestamp;
             await network.provider.send("evm_setNextBlockTimestamp", [lastBlockTimestamp + testUtils.THIRD_PERIOD]);
-            await token.connect(investor).approve(owner.address, value);
 
+            /*
+                We can call approve after end of ICO even if we aren't in the whiteList
+            */
+            await token.connect(investor).approve(owner.address, value);
             expect(await token.allowance(investor.address, owner.address)).to.be.eq(value);
         });
 
         it("Token.transferFrom should work only after end of ICO or if investor is in the whiteList", async function() {
+            /*
+                We cannot call transferFrom before end of ICO and if we aren't in the whiteList
+            */
             await expect(token.transferFrom(investor.address, owner.address, value))
                 .to.be.rejectedWith(Error)
                 .then((error) => {
@@ -172,7 +192,9 @@ describe("Token testing", function () {
             await token.addToWhiteList(owner.address);
             await token.addToWhiteList(investor.address);
             await token.connect(investor).approve(owner.address, value);
-
+            /*
+                We can call transferFrom before end of ICO if we are in the whiteList
+            */
             await token.transferFrom(investor.address, owner.address, value);
 
             expect(await token.balanceOf(investor.address)).to.be.eq(0);
@@ -185,6 +207,9 @@ describe("Token testing", function () {
             await network.provider.send("evm_setNextBlockTimestamp", [lastBlockTimestamp + testUtils.THIRD_PERIOD]);
 
             await token.approve(investor.address, value);
+            /*
+                We can call transferFrom after end of ICO even if we aren't in the whiteList
+            */
             await token.connect(investor).transferFrom(owner.address, investor.address, value);
 
             expect(await token.balanceOf(investor.address)).to.be.eq(value);
