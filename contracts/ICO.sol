@@ -14,13 +14,13 @@ contract ICO is Ownable {
         In the second one - 21 TTT token for 1 ETH.
         And the last one -  8 TTT token for 1 ETH.
     */
-    uint constant FIRST_PERIOD = 3 days;
-    uint constant SECOND_PERIOD = FIRST_PERIOD + 30 days;
-    uint constant THIRD_PERIOD = SECOND_PERIOD + 2 weeks;
+    uint public constant FIRST_PERIOD = 3 days;
+    uint public constant SECOND_PERIOD = FIRST_PERIOD + 30 days;
+    uint public constant THIRD_PERIOD = SECOND_PERIOD + 2 weeks;
 
-    uint constant TOKENS_PER_ONE_ETH_FIRST_PERIOD = 42;
-    uint constant TOKENS_PER_ONE_ETH_SECOND_PERIOD = 21;
-    uint constant TOKENS_PER_ONE_ETH_THIRD_PERIOD = 8;
+    uint public constant TOKENS_PER_ONE_ETH_FIRST_PERIOD = 42;
+    uint public constant TOKENS_PER_ONE_ETH_SECOND_PERIOD = 21;
+    uint public constant TOKENS_PER_ONE_ETH_THIRD_PERIOD = 8;
 
     uint public immutable ICO_START_TIME;
     uint public immutable ICO_END_TIME;

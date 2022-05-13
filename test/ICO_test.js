@@ -26,6 +26,7 @@ describe("ICO testing", function () {
     it("ICO should be created correctly", async function () {
         const lastBlockTImestamp = (await ethers.provider.getBlock("latest")).timestamp;
 
+        await ICO.FIRST_PERIOD();
         expect(await ICO.ICO_START_TIME()).to.be.equal(lastBlockTImestamp);
         expect(await ICO.ICO_END_TIME()).to.be.eq(lastBlockTImestamp + testUtils.THIRD_PERIOD);
         expect(await ICO.TOKEN()).to.be.properAddress;
