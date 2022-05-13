@@ -28,7 +28,7 @@ contract TTT is ICOToken, Ownable {
         _;
     }
 
-    modifier ICOInProccessing() {
+    modifier ICOIsActive() {
         require(block.timestamp > ICO_END_TIME,
             "ICO is done");
         _;
@@ -72,7 +72,7 @@ contract TTT is ICOToken, Ownable {
         external
         override
         isICO
-        ICOInProccessing
+        ICOIsActive
     {
         _mint(reciever, amount);
     }

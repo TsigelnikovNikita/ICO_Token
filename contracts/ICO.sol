@@ -2,9 +2,9 @@
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+
+import "./ICOToken.sol";
 
 contract ICO is Ownable {
     /*
@@ -17,22 +17,64 @@ contract ICO is Ownable {
     uint constant SECOND_PERIOD = FIRST_PERIOD + 30 days;
     uint constant THIRD_PERIOD = SECOND_PERIOD + 2 weeks;
 
-    uint public immutable icoStartTime;
-    uint public immutable icoEndTime;
-    IERC20 public immutable tokenAddress;
-    bool public icoComplited;
+    uint constant TOKENS_PER_ONE_ETH_FIRST_PERIOD = 42;
+    uint constant TOKENS_PER_ONE_ETH_SECOND_PERIOD = 21;
+    uint constant TOKENS_PER_ONE_ETH_THIRD_PERIOD = 8;
 
-    constructor(address _tokenAddress) {
-        icoStartTime = block.timestamp;
-        icoEndTime = block.timestamp + THIRD_PERIOD;
-        tokenAddress = IERC20(_tokenAddress);
+    uint public immutable ICO_START_TIME;
+    uint public immutable ICO_END_TIME;
+    ICOToken public immutable TOKEN;
+
+
+    constructor(address _tokenAddress, uint ICO_EndTIme) {
+        ICO_START_TIME = block.timestamp;
+        ICO_END_TIME = ICO_EndTIme;
+        TOKEN = ICOToken(_tokenAddress);
     }
 
-    function buy() public payable {
-        // logic of buying tokens
+
+    /*
+        events
+    */
+    event bought(address indexed buyer, uint value);
+
+
+    /*
+        modifiers
+    */
+    modifier ICOisActive() {
+        require(block.timestamp > ICO_END_TIME,
+            "ICO is done");
+        _;
+    }
+
+
+    function buy()
+        public
+        payable
+        ICOisActive
+    {
+        uint256 amount;
+        if (block.timestamp < ICO_START_TIME + FIRST_PERIOD) {
+            amount = msg.value * TOKENS_PER_ONE_ETH_FIRST_PERIOD;
+        } else if (block.timestamp < ICO_START_TIME + SECOND_PERIOD) {
+            amount = msg.value * TOKENS_PER_ONE_ETH_SECOND_PERIOD;
+        } else {
+            amount = msg.value * TOKENS_PER_ONE_ETH_THIRD_PERIOD;
+        }
+        TOKEN.buyTokens(msg.sender, amount);
+        emit bought(msg.sender, amount);
     }
 
     function recieve() external payable {
         buy();
+    }
+
+    function withdraw(uint amount)
+        external
+        onlyOwner
+    {
+        amount = amount == 0 ? address(this).balance : amount;
+        payable(msg.sender).transfer(amount);
     }
 }
