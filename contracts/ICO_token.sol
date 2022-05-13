@@ -55,14 +55,8 @@ contract ICO_Token is ERC20, Ownable {
         _;
     }
 
-    modifier isWhiteListParticipant(address participant) {
-        require(whiteList[participant] == true,
-            "You are not in white list");
-        _;
-    }
-
     modifier allowTransfer() {
-        require(ICOisEnd() || whiteList[msg.sender] == true, "ICO in processing");
+        require(ICOisEnd() || whiteList[msg.sender] == true, "Token: ICO in processing");
         _;
     }
 
@@ -144,6 +138,7 @@ contract ICO_Token is ERC20, Ownable {
         public
         virtual
         override
+        allowTransfer
         returns (bool)
     {
         return super.approve(spender, amount);
