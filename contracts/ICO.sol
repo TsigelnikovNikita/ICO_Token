@@ -47,11 +47,11 @@ contract ICO is Ownable {
     */
     modifier ICOisActive() {
         require(block.timestamp < ICO_END_TIME,
-            "ICO is done");
+            "ICO: ICO is done");
         _;
     }
 
-    function getCurrentExchangeRate() public view returns(uint) {
+    function getCurrentExchangeRate() internal view returns(uint) {
         if (block.timestamp < ICO_START_TIME + FIRST_PERIOD) {
             return TOKENS_PER_ONE_ETH_FIRST_PERIOD;
         } else if (block.timestamp < ICO_START_TIME + SECOND_PERIOD) {
@@ -77,9 +77,9 @@ contract ICO is Ownable {
     {
         uint currentExchangeRate = getCurrentExchangeRate();
 
-        require(amount <= msg.value * currentExchangeRate);
+        require(amount <= msg.value * currentExchangeRate, "ICO: not enought ethers");
         if (amount < msg.value * currentExchangeRate) {
-            uint payback = (msg.value * currentExchangeRate - amount) / currentExchangeRate;
+            uint payback = msg.value - msg.value / currentExchangeRate;
             payable(msg.sender).transfer(payback);
         }
         TOKEN.buyTokens(msg.sender, amount);

@@ -85,7 +85,7 @@ describe("ICO testing", function () {
             await expect(ICO.connect(investor)['buy()']({value: value}))
                 .to.be.rejectedWith(Error)
                 .then((error) => {
-                    expect(error.message).to.be.contain("ICO is done");
+                    expect(error.message).to.be.contain("ICO: ICO is done");
                 });
         });
 
@@ -96,6 +96,84 @@ describe("ICO testing", function () {
             expect(await token.balanceOf(investor.address)).to.be.eq(value.mul(42));
             expect(sendTransactionTx)
                 .to.changeEtherBalances([investor, ICO], [BigNumber.from(0).sub(value), value]);
+        });
+    });
+
+    describe("ICO.buy(uint256) function testing", function () {
+        let value
+
+        beforeEach(async function () {
+            value = ethers.utils.parseEther(testUtils.getRandomEthers(1, 10));
+        });
+
+        it("buy(uint256) method should correctly transfer value from investor to " +
+            "the contract and emit an event", async function () {
+            const amount = value.mul(42);
+            const buyTx = await ICO.connect(investor)['buy(uint256)'](amount, {value: value});
+
+            await expect(() => buyTx)
+                .to.changeEtherBalances([ICO, investor], [value, BigNumber.from(0).sub(value)]);
+            await expect(buyTx)
+                .to.emit(ICO, "bought")
+                .withArgs(investor.address, value.mul(42));
+        });
+
+        it("buy(uint256) method should transfer correct TTT token amount in the first period", async function () {
+            const amount = value.mul(42);
+
+            await ICO.connect(investor)['buy(uint256)'](amount, {value: value});
+            expect(await token.balanceOf(investor.address)).to.be.eq(amount);
+        });
+
+        it("buy(uint256) method should transfer correct TTT token amount in the second period", async function () {
+            const lastBlockTimestamp = (await ethers.provider.getBlock("latest")).timestamp;
+            await network.provider.send("evm_setNextBlockTimestamp", [lastBlockTimestamp + testUtils.FIRST_PERIOD]);
+
+            const amount = value.mul(21);
+
+            await ICO.connect(investor)['buy(uint256)'](amount, {value: value});
+            expect(await token.balanceOf(investor.address)).to.be.eq(amount);
+        });
+
+        it("buy(uint) method should transfer correct TTT token amount in the third period", async function () {
+            const lastBlockTimestamp = (await ethers.provider.getBlock("latest")).timestamp;
+            await network.provider.send("evm_setNextBlockTimestamp", [lastBlockTimestamp + testUtils.SECOND_PERIOD]);
+
+            const amount = value.mul(8);
+
+            await ICO.connect(investor)['buy(uint256)'](amount, {value: value});
+
+            expect(await token.balanceOf(investor.address)).to.be.eq(amount);
+        });
+
+        it("buy(uint256) method should throw an exception after end of ICO", async function () {
+            const lastBlockTimestamp = (await ethers.provider.getBlock("latest")).timestamp;
+            await network.provider.send("evm_setNextBlockTimestamp", [lastBlockTimestamp + testUtils.THIRD_PERIOD]);
+
+            await expect(ICO.connect(investor)['buy(uint256)'](1, {value: value}))
+                .to.be.rejectedWith(Error)
+                .then((error) => {
+                    expect(error.message).to.be.contain("ICO: ICO is done");
+                });
+        });
+        
+        it("buy(uint256) method should throw an exception if not enough ethers", async function () {
+            const amount = value.mul(100);
+            await expect(ICO.connect(investor)['buy(uint256)'](amount, {value: value}))
+                .to.be.rejectedWith(Error)
+                .then((error) => {
+                    expect(error.message).to.be.contain("ICO: not enought ethers");
+                });
+        });
+        
+        it("buy(uint256) method should payback extra ethers", async function () {
+            const amount = value;
+
+            const buyTx = ICO.connect(investor)['buy(uint256)'](amount, {value: value});
+            const payback = value.sub(value.div(42));
+            const difference = value.sub(payback);
+            await expect(() => buyTx)
+                .to.changeEtherBalances([investor, ICO], [BigNumber.from(0).sub(difference), difference]);
         });
     });
 
