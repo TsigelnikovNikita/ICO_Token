@@ -45,13 +45,13 @@ contract ICO_Token is ERC20, Ownable {
     */
     modifier isICO() {
         require(msg.sender == ICO_ADDRESS,
-            "This method can call only ICO contract");
+            "Token: caller is not ICO");
         _;
     }
 
     modifier ICOIsActive() {
         require(block.timestamp < ICO_END_TIME,
-            "ICO is done");
+            "Token: ICO is done");
         _;
     }
 

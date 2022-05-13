@@ -28,6 +28,27 @@ describe("Token testing", function () {
         await token.deployed();
     });
 
+    describe("Token.buyTokens testing", function() {
+        it("Token.buy should throw an expection if was called not by ICO", async function() {
+            await expect(token.connect(investor).buyTokens(investor.address, 123))
+            .to.be.rejectedWith(Error)
+            .then((error) => {
+                expect(error.message).to.be.contain("Token: caller is not ICO");
+            });
+        });
+
+        it("Token.buy should throw an expection if was called after end of ICO", async function() {
+            const lastBlockTimestamp = (await ethers.provider.getBlock("latest")).timestamp;
+            await network.provider.send("evm_setNextBlockTimestamp", [lastBlockTimestamp + testUtils.THIRD_PERIOD]);
+
+            await expect(token.connect(ICO).buyTokens(investor.address, 123))
+            .to.be.rejectedWith(Error)
+            .then((error) => {
+                expect(error.message).to.be.contain("Token: ICO is done");
+            });
+        });
+    });
+
     describe("Token.whiteList testing", function() {
         it("Token.addToWhiteList should work correctly", async function() {
             await token.addToWhiteList(investor.address);
