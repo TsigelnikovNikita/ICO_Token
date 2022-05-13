@@ -51,7 +51,11 @@ describe("Token testing", function () {
 
     describe("Token.whiteList testing", function() {
         it("Token.addToWhiteList should work correctly", async function() {
-            await token.addToWhiteList(investor.address);
+            const addToWhiteListTx = await token.addToWhiteList(investor.address);
+
+            await expect(addToWhiteListTx)
+                .to.emit(token, 'addedToWhiteList')
+                .withArgs(investor.address);
 
             expect(await token.whiteList(investor.address)).to.be.eq(true);
         });
@@ -60,9 +64,13 @@ describe("Token testing", function () {
             await token.addToWhiteList(investor.address);
             expect(await token.whiteList(investor.address)).to.be.eq(true);
         
-            await token.removeFromWhiteList(investor.address);
-            expect(await token.whiteList(investor.address)).to.be.eq(false);
-        
+            const removeFromWhiteListTx = await token.removeFromWhiteList(investor.address);
+
+            await expect(removeFromWhiteListTx)
+                .to.emit(token, 'removedFromWhiteList')
+                .withArgs(investor.address);
+
+            expect(await token.whiteList(investor.address)).to.be.eq(false);        
         });
 
         it("Token.removeFromWhiteList/Token.addToWhiteList should throw an exception when not owner called", async function() {
