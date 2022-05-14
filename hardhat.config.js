@@ -2,6 +2,8 @@ require("@nomiclabs/hardhat-waffle");
 require('hardhat-dependency-compiler');
 require('solidity-coverage');
 require("@nomiclabs/hardhat-etherscan");
+require("hardhat-gas-reporter");
+
 require("dotenv").config();
 
 require('./tasks/ICO_buy');
@@ -22,6 +24,10 @@ module.exports = {
     rinkeby: {
       url: `${process.env.RINKEBY_NETWORK_URI}`,
       accounts: [`${process.env.SIGNER_PRIVATE_KEY}`]
+    },
+    ropsten: {
+      url: `${process.env.ROPSTEN_NETWORK_URI}`,
+      accounts: [`${process.env.SIGNER_PRIVATE_KEY}`]
     }
   },
   dependencyCompiler: {
@@ -29,6 +35,10 @@ module.exports = {
       "@openzeppelin/contracts/token/ERC20/ERC20.sol",
       "@openzeppelin/contracts/access/Ownable.sol",
     ],
+  },
+  gasReporter: {
+    enabled: true,
+    currency: 'USD',
   },
 };
 

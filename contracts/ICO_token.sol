@@ -17,7 +17,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
     to/remove from this list. Participant from whiteList may have additional
     privileges (for example transfer tokens before ICO ending).
 
-    Repo of this project: https://github.com/TsigelnikovNikita/ICO_Token
+    You can find full project here: https://github.com/TsigelnikovNikita/ICO_Token
 */
 contract ICO_Token is ERC20, Ownable {
     /*

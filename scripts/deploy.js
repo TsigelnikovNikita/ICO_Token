@@ -1,17 +1,25 @@
 const { ethers } = require("hardhat");
 
-async function main() {
-    const ICOContract = await ethers.getContractFactory("ICO");
-    const ICO = await ICOContract.deploy();
-    await ICO.deployed();
-
-    let chainName
+async function main() {    
+    let chainName;
     const network = await ethers.provider.getNetwork();
     switch (network.chainId) {
         case 3:
         case 4:
             chainName = network.name;
     }
+
+    const ICOContract = await ethers.getContractFactory("ICO");
+    const ICO = await ICOContract.deploy();
+
+    const transactionHash = ICO.deployTransaction.hash;
+    if (chainName != undefined) {
+        transactionHash = `https://${chainName}.etherscan.io/tx/${transactionHash}`;
+    }
+    console.log("Contract is creating...\n" +
+                "Transaction hash: " + ICO.deployTransaction.hash + "\n");
+
+    await ICO.deployed();
 
     let ICO_address = ICO.address;
     let Token_address = await ICO.TOKEN();
